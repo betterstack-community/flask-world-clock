@@ -1,15 +1,19 @@
 import os
 import logging
+import time
 from flask import Flask, request, render_template
 import requests
 
 app = Flask(__name__)
 
+# Specify the full path to the logs folder
 logs_folder = os.path.join(os.getcwd(), 'logs')
 
+# Create the logs folder if it doesn't exist
 if not os.path.exists(logs_folder):
     os.makedirs(logs_folder)
 
+# Configure logging to write logs to the specified folder
 log_file = os.path.join(logs_folder, 'app.log')
 logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
 
@@ -23,10 +27,18 @@ def search():
 
     logging.info(f'Search query: {query}')
 
+    start_time = time.time()
+
     location = requests.get(
         "https://nominatim.openstreetmap.org/search",
         {"q": query, "format": "json", "limit": "1"},
     ).json()
+
+    end_time = time.time()
+
+    duration = end_time - start_time
+
+    logging.info(f'Latency for search: {duration} seconds')
 
     if location:
         coordinate = [location[0]["lat"], location[0]["lon"]]

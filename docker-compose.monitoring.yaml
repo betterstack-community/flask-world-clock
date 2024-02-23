@@ -1,0 +1,42 @@
+version: "3.8"
+networks:
+  monitoring:
+    driver: bridge
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+services:
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+    #password: admin/admin
+  
+
+  
+
+  loki:
+    image: grafana/loki:2.5.0
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config/:/etc/loki/
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.5.0
+    ports:
+      - "9080:9080"
+    volumes:
+      - ./logs:/var/apilogs
+      - /var/log:/var/log
+      - ./promtail-config/:/etc/promtail/
+    command: -config.file=/etc/promtail/promtail.yaml
