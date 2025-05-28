@@ -16,10 +16,16 @@ def search():
     # Get the search query
     query = request.form["q"]
 
+    # Add proper headers for Nominatim API
+    headers = {
+        'User-Agent': 'Flask World Clock App (your-email@example.com)'
+    }
+    
     # Pass the search query to the Nominatim API to get a location
     location = requests.get(
         "https://nominatim.openstreetmap.org/search",
-        {"q": query, "format": "json", "limit": "1"},
+        params={"q": query, "format": "json", "limit": "1"},
+        headers=headers
     ).json()
 
     # If a location is found, pass the coordinate to the Time API to get the current time
